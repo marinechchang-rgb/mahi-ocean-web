@@ -5,7 +5,7 @@ const labels={sst:'海面水溫 SST',50:'50 m 水溫',100:'100 m 水溫',200:'20
 const notes={sst:'JMA HIMSST 每日海面水溫。',psat:'SST-only proxy：25–27°C；24–25°C 與 27–28°C 線性過渡。',cpue:'SST-only proxy：26–28°C；25–26°C 與 28–29°C 線性過渡。',legacy:'獨立 T100 proxy：17.8–23.1°C；16.8–17.8°C 與 23.1–24.1°C 線性過渡。'};
 const stops=[[35,62,128],[33,167,179],[128,210,177],[241,209,107],[223,99,70]];
 function color(t){t=Math.max(0,Math.min(1,t))*4;let i=Math.min(3,Math.floor(t)),f=t-i;return `rgb(${stops[i].map((a,j)=>Math.round(a*(1-f)+stops[i+1][j]*f)).join(',')})`;}
-function plot(){let size=Math.min(canvas.width-110,canvas.height-80);return [55,30,size,size];}
+function plot(){let size=Math.min(canvas.width-110,canvas.height-80);return [(canvas.width-size)/2,30,size,size];}
 function xy(lon,lat){const [x,y,w,h]=plot();return [x+(lon-extent[0])/(extent[1]-extent[0])*w,y+(extent[3]-lat)/(extent[3]-extent[2])*h];}
 function ll(x,y){const [a,b,w,h]=plot();return [extent[0]+(x-a)/w*(extent[1]-extent[0]),extent[3]-(y-b)/h*(extent[3]-extent[2])];}
 function range(){return ['psat','cpue','legacy'].includes($('layer').value)?[0,1]:[8,32];}
