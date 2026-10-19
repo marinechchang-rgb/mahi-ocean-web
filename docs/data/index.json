@@ -1,0 +1,157 @@
+{
+  "generated_at": "2026-10-19T08:22:41.532922+00:00",
+  "dates": [
+    {
+      "date": "2026-10-18",
+      "file": "2026-10-18.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue"
+      ],
+      "current": false
+    },
+    {
+      "date": "2026-10-17",
+      "file": "2026-10-17.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
+    },
+    {
+      "date": "2026-10-16",
+      "file": "2026-10-16.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
+    },
+    {
+      "date": "2026-10-15",
+      "file": "2026-10-15.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
+    },
+    {
+      "date": "2026-10-14",
+      "file": "2026-10-14.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
+    },
+    {
+      "date": "2026-10-13",
+      "file": "2026-10-13.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
+    },
+    {
+      "date": "2026-10-12",
+      "file": "2026-10-12.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
+    },
+    {
+      "date": "2026-10-11",
+      "file": "2026-10-11.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
+    },
+    {
+      "date": "2026-10-10",
+      "file": "2026-10-10.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
+    },
+    {
+      "date": "2026-10-09",
+      "file": "2026-10-09.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
+    }
+  ],
+  "extent": [
+    115,
+    125,
+    20,
+    30
+  ],
+  "model_version": "2.0.0"
+}
