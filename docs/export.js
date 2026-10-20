@@ -21,7 +21,7 @@ pngButton.onclick=async()=>{
   pen.fillStyle='#fff';pen.fillRect(0,2160,2400,240);pen.fillStyle='#426461';pen.font='25px "Microsoft JhengHei",sans-serif';
   pen.fillText('資料：JMA GOOS HIMSST / NPRSUBT / NPRSUBC（依圖層） · 底圖：Natural Earth',60,2210);
   pen.fillText('HSI 為未校準相對適合度 0–1；非捕獲機率、魚群位置或漁獲保證。',60,2255);
-  pen.fillText('SSS、MLD 尚無實測輸入；海流僅供疊圖。缺值保持空白。',60,2300);
+  pen.fillText(key==='sst'?'SST 等溫線：25、26、27、28°C；缺值保持空白。':'SSS、MLD 尚無實測輸入；海流僅供疊圖。缺值保持空白。',60,2300);
   pen.font='22px sans-serif';pen.fillText('marinechchang-rgb.github.io/mahi-ocean-web/',60,2350);
   const blob=await new Promise((resolve,reject)=>out.toBlob(b=>b?resolve(b):reject(Error('PNG 產製失敗')),'image/png'));
   const dataUrl=out.toDataURL('image/png'),a=$('pngLink');a.href=dataUrl;a.download=`mahi-${snapshot.date}-${key}.png`;$('pngImage').src=dataUrl;$('pngPreview').hidden=false;a.click();$('status').textContent='已產製 2400 × 2400 PNG，含日期、LOGO 與圖例；可展開預覽或再次下載。';

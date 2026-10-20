@@ -3,6 +3,7 @@ const $=id=>document.getElementById(id), canvas=$('map'), ctx=canvas.getContext(
 let index, product, land, extent=[115,125,20,30], request=0, dragging=null;
 const labels={sst:'海面水溫 SST',50:'50 m 水溫',100:'100 m 水溫',200:'200 m 水溫',400:'400 m 水溫',psat:'HSI · PSAT 停留研究',cpue:'HSI · CPUE 漁獲研究',legacy:'HSI · 舊版 100 m 探索'};
 const notes={sst:'JMA HIMSST 每日海面水溫。',psat:'SST-only proxy：25–27°C；24–25°C 與 27–28°C 線性過渡。',cpue:'SST-only proxy：26–28°C；25–26°C 與 28–29°C 線性過渡。',legacy:'獨立 T100 proxy：17.8–23.1°C；16.8–17.8°C 與 23.1–24.1°C 線性過渡。'};
+const contourCache=new WeakMap();
 const stops=[[35,62,128],[33,167,179],[128,210,177],[241,209,107],[223,99,70]];
 function color(t){t=Math.max(0,Math.min(1,t))*4;let i=Math.min(3,Math.floor(t)),f=t-i;return `rgb(${stops[i].map((a,j)=>Math.round(a*(1-f)+stops[i+1][j]*f)).join(',')})`;}
 function plot(){let size=Math.min(canvas.width-110,canvas.height-80);return [(canvas.width-size)/2,30,size,size];}
@@ -12,14 +13,29 @@ function range(){return ['psat','cpue','legacy'].includes($('layer').value)?[0,1
 function draw(){
  ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#e5efef';ctx.fillRect(0,0,canvas.width,canvas.height);
  const [px,py,pw,ph]=plot();ctx.save();ctx.beginPath();ctx.rect(px,py,pw,ph);ctx.clip();
- const key=$('layer').value,g=product?.layers[key],r=range();
+ const key=$('layer').value,g=product?.layers[key],r=range(),contourLabels=[];
  if(g){ctx.globalAlpha=Number($('opacity').value);let dx=Math.abs(g.lon[1]-g.lon[0])/2,dy=Math.abs(g.lat[1]-g.lat[0])/2;
  for(let i=0;i<g.lat.length;i++)for(let j=0;j<g.lon.length;j++){let v=g.values[i][j];if(v===null)continue;let [x,y]=xy(g.lon[j]-dx,g.lat[i]+dy),[x2,y2]=xy(g.lon[j]+dx,g.lat[i]-dy);ctx.fillStyle=color((v-r[0])/(r[1]-r[0]));ctx.fillRect(x,y,x2-x+.3,y2-y+.3);}ctx.globalAlpha=1;}
+ if(key==='sst'&&g){
+  if(!contourCache.has(g))contourCache.set(g,sstContours(g));
+  const placed=[];
+  for(const {level,segments} of contourCache.get(g)){
+   ctx.beginPath();for(const [a,b] of segments){ctx.moveTo(...xy(...a));ctx.lineTo(...xy(...b));}
+   ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=3;ctx.stroke();ctx.strokeStyle='#284c63';ctx.lineWidth=1.2;ctx.stroke();
+   let count=0;for(const [a,b] of segments){
+    const [x,y]=xy((a[0]+b[0])/2,(a[1]+b[1])/2);
+    if(x<px+35||x>px+pw-35||y<py+20||y>py+ph-20||placed.some(p=>Math.hypot(p[0]-x,p[1]-y)<125))continue;
+    contourLabels.push({level,x,y});placed.push([x,y]);if(++count>=3)break;
+   }
+  }
+  ctx.textBaseline='alphabetic';
+ }
  if(land){ctx.fillStyle='#f1f2e9';ctx.strokeStyle='#91a79c';ctx.lineWidth=1;for(const poly of land){ctx.beginPath();for(const ring of poly){ring.forEach(([lon,lat],i)=>{const [x,y]=xy(lon,lat);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.closePath();}ctx.fill('evenodd');ctx.stroke();}}
  ctx.strokeStyle='#355f6524';ctx.lineWidth=1;for(let n=110;n<=135;n++){let a=xy(n,extent[2]),b=xy(n,extent[3]);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();}for(let n=10;n<=40;n++){let a=xy(extent[0],n),b=xy(extent[1],n);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();}
  if($('current').checked&&product?.current){let {u,v}=product.current;ctx.strokeStyle='#163e50';ctx.lineWidth=1.6;for(let i=0;i<u.lat.length;i++)for(let j=0;j<u.lon.length;j++){let a=u.values[i][j],b=v.values[i][j];if(a===null||b===null)continue;let [x,y]=xy(u.lon[j],u.lat[i]),dx=a*20,dy=-b*20,len=Math.hypot(dx,dy);if(len<1)continue;let ang=Math.atan2(dy,dx);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.moveTo(x+dx-5*Math.cos(ang-.45),y+dy-5*Math.sin(ang-.45));ctx.lineTo(x+dx,y+dy);ctx.lineTo(x+dx-5*Math.cos(ang+.45),y+dy-5*Math.sin(ang+.45));ctx.stroke();}}
+ for(const {level,x,y} of contourLabels){ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=4;ctx.strokeStyle='white';ctx.strokeText(level+'°C',x,y);ctx.fillStyle='#163e50';ctx.fillText(level+'°C',x,y);}ctx.textBaseline='alphabetic';
  ctx.restore();ctx.font='12px sans-serif';ctx.fillStyle='#567773';ctx.textAlign='center';for(let n=Math.ceil(extent[0]);n<=extent[1];n++){let [x,y]=xy(n,extent[2]);ctx.fillText(n+'°E',x,y+22);}ctx.textAlign='right';for(let n=Math.ceil(extent[2]);n<=extent[3];n++){let [x,y]=xy(extent[0],n);ctx.fillText(n+'°N',x-8,y+4);}ctx.textAlign='center';ctx.font='bold 15px sans-serif';for(const [name,lon,lat] of [['臺灣',121,23.7],['福建',117.1,26.3],['琉球',124.2,25.5]]){const [x,y]=xy(lon,lat);if(x>=px&&x<=px+pw&&y>=py&&y<=py+ph)ctx.fillText(name,x,y);}
- $('legend').innerHTML=`${labels[key]}<div class="ramp"></div><div class="scale"><span>${r[0]}</span><span>${(r[0]+r[1])/2}</span><span>${r[1]} ${g?.unit||''}</span></div>${$('current').checked&&product?.current?'<div>海流箭頭：20 圖面像素 = 1 m/s</div>':''}`;
+ $('legend').innerHTML=`${labels[key]}${key==='sst'?'<div>等溫線：25、26、27、28°C</div>':''}<div class="ramp"></div><div class="scale"><span>${r[0]}</span><span>${(r[0]+r[1])/2}</span><span>${r[1]} ${g?.unit||''}</span></div>${$('current').checked&&product?.current?'<div>海流箭頭：20 圖面像素 = 1 m/s</div>':''}`;
 }
 function update(){$('readout').textContent='移動游標或點擊地圖查值';const key=$('layer').value,g=product?.layers[key];$('mapTitle').textContent=`${product?.date||'—'} / ${labels[key]}`;$('modelTitle').textContent=labels[key];$('modelNote').textContent=notes[key]||'JMA NPRSUBT 每日次表層水溫。';$('export').disabled=!g;$('status').textContent=g?'缺測格點留白；海況與 HSI 僅供研究參考。':'所選日期沒有此圖層資料，請選擇其他日期或圖層。';draw();}
 async function loadDate(){const serial=++request;product=null;$('export').disabled=true;$('status').textContent='載入中…';draw();try{const entry=index.dates.find(d=>d.date===$('date').value);const response=await fetch('data/'+entry.file);if(!response.ok)throw Error('HTTP '+response.status);const next=await response.json();if(serial!==request)return;product=next;for(const op of $('layer').options)op.disabled=!product.layers[op.value];if(!product.layers[$('layer').value])$('layer').value=Object.keys(product.layers)[0];$('current').disabled=!product.current;if(!product.current)$('current').checked=false;$('currentState').textContent=product.current?'':'（本日缺測）';const age=Math.floor((Date.now()-Date.parse(product.date+'T00:00:00Z'))/86400000);$('freshness').textContent=`觀測日 ${product.date} · 距今 ${Math.max(0,age)} 天${age>14?' · 歷史資料，非近期海況':''}`;$('sources').replaceChildren();for(const s of Object.values(product.sources)){const a=document.createElement('a');a.href=s.url;a.textContent=s.filename+' ↗';a.target='_blank';a.rel='noopener';$('sources').append(a);}update();}catch(e){if(serial===request){$('status').textContent='資料載入失敗：'+e.message;product=null;draw();}}}
