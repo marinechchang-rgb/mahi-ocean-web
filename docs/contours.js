@@ -1,6 +1,15 @@
 'use strict';
-// Marching squares on the dated SST grid; never interpolate through missing cells.
-function sstContours(grid,levels=[25,26,27,28]){
+// Every integer Celsius value in this dated grid, without crossing missing cells.
+function integerTemperatureLevels(grid){
+ let min=Infinity,max=-Infinity;
+ for(const row of grid.values)for(const value of row){
+  if(value!==null&&Number.isFinite(value)){min=Math.min(min,value);max=Math.max(max,value);}
+ }
+ const levels=[];
+ for(let level=Math.ceil(min);level<=Math.floor(max);level++)levels.push(level);
+ return levels;
+}
+function temperatureContours(grid,levels=integerTemperatureLevels(grid)){
  return levels.map(level=>{
   const segments=[];
   for(let i=0;i<grid.lat.length-1;i++)for(let j=0;j<grid.lon.length-1;j++){
@@ -25,4 +34,4 @@ function sstContours(grid,levels=[25,26,27,28]){
   return {level,segments};
  });
 }
-if(typeof module!=='undefined')module.exports={sstContours};
+if(typeof module!=='undefined')module.exports={temperatureContours,integerTemperatureLevels};
