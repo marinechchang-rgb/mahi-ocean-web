@@ -6,7 +6,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: ocean-update
+  group: pages
   cancel-in-progress: false
 jobs:
   update:

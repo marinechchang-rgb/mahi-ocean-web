@@ -1,15 +1,16 @@
 'use strict';
 const pngButton=$('exportPng');
+let pngBusy=false;
 // Observe the existing export state, including loading and failed requests.
-new MutationObserver(()=>{pngButton.disabled=$('export').disabled;}).observe($('export'),{attributes:true,attributeFilter:['disabled']});
+new MutationObserver(()=>{pngButton.disabled=pngBusy||$('export').disabled;}).observe($('export'),{attributes:true,attributeFilter:['disabled']});
 pngButton.disabled=$('export').disabled;
 pngButton.onclick=async()=>{
- if(!product?.layers[$('layer').value])return;
+ if(pngBusy||!product?.layers[$('layer').value])return;
  const snapshot=product,key=$('layer').value,g=snapshot.layers[key],limits=range(),withCurrent=$('current').checked&&!!snapshot.current;
  const out=document.createElement('canvas');out.width=2400;out.height=2400;
  const pen=out.getContext('2d');pen.fillStyle='#ffffff';pen.fillRect(0,0,out.width,out.height);
  pen.drawImage(canvas,0,230,2400,1920);
- pngButton.disabled=true;pngButton.textContent='產製圖片中…';
+ pngBusy=true;pngButton.disabled=true;pngButton.textContent='產製圖片中…';
  try{
   const logo=new Image();logo.src='assets/tfrin-logo.png';await logo.decode();pen.drawImage(logo,28,22,175,175);
   pen.fillStyle='#173e48';pen.font='bold 39px "Microsoft JhengHei",sans-serif';pen.fillText('農業部水產試驗所 鬼頭刀漁海況研究小組',215,83);
@@ -25,5 +26,5 @@ pngButton.onclick=async()=>{
   const blob=await new Promise((resolve,reject)=>out.toBlob(b=>b?resolve(b):reject(Error('PNG 產製失敗')),'image/png'));
   const dataUrl=out.toDataURL('image/png'),a=$('pngLink');a.href=dataUrl;a.download=`mahi-${snapshot.date}-${key}.png`;$('pngImage').src=dataUrl;$('pngPreview').hidden=false;a.click();$('status').textContent='已產製 2400 × 2400 PNG，含日期、LOGO 與圖例；可展開預覽或再次下載。';
  }catch(e){$('status').textContent='圖片匯出失敗：'+e.message;}
- finally{pngButton.disabled=$('export').disabled;pngButton.textContent='下載簡報 PNG';}
+ finally{pngBusy=false;pngButton.disabled=$('export').disabled;pngButton.textContent='下載簡報 PNG';}
 };
