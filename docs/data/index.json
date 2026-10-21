@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20T01:07:51.773108+00:00",
+  "generated_at": "2026-10-21T00:42:13.124004+00:00",
   "dates": [
     {
       "date": "2026-10-19",
@@ -7,9 +7,14 @@
       "layers": [
         "sst",
         "psat",
-        "cpue"
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
       ],
-      "current": false
+      "current": true
     },
     {
       "date": "2026-10-18",
