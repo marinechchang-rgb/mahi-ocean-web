@@ -1,15 +1,30 @@
 {
-  "generated_at": "2026-10-30T02:02:10.580312+00:00",
+  "generated_at": "2026-10-31T01:40:59.695771+00:00",
   "dates": [
     {
-      "date": "2026-10-29",
-      "file": "2026-10-29.json",
+      "date": "2026-10-30",
+      "file": "2026-10-30.json",
       "layers": [
         "sst",
         "psat",
         "cpue"
       ],
       "current": false
+    },
+    {
+      "date": "2026-10-29",
+      "file": "2026-10-29.json",
+      "layers": [
+        "sst",
+        "psat",
+        "cpue",
+        "50",
+        "100",
+        "200",
+        "400",
+        "legacy"
+      ],
+      "current": true
     },
     {
       "date": "2026-10-28",
@@ -119,21 +134,6 @@
     {
       "date": "2026-10-21",
       "file": "2026-10-21.json",
-      "layers": [
-        "sst",
-        "psat",
-        "cpue",
-        "50",
-        "100",
-        "200",
-        "400",
-        "legacy"
-      ],
-      "current": true
-    },
-    {
-      "date": "2026-10-20",
-      "file": "2026-10-20.json",
       "layers": [
         "sst",
         "psat",
